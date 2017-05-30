@@ -15,13 +15,26 @@ app.use(express.static(__dirname + '/public'));
 // Chatroom
 
 var numUsers = 0;
+var userList = [];
 
+function addUserToList(user){
+  userList.push(user);
+};
+
+function delUserFromList(user){
+  var i = userList.indexOf(user);
+  userList.splice(i, 1);
+};
+
+    
 io.on('connection', function (socket) {
   socket.broadcast.emit('user joined', {
     socketid: socket.id
   });
   numUsers ++;  
+  addUserToList(socket.id);
   console.log('connected socket id ' + socket.id + ' and there are ' + numUsers + ' total users.');
+  console.log(userList);
 
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
@@ -31,6 +44,7 @@ io.on('connection', function (socket) {
       message: data
     });
     console.log(socket.id + ': ' + data);
+    console.log(userList);
   });
 
   socket.on('disconnect', function(username){
@@ -39,6 +53,8 @@ io.on('connection', function (socket) {
         socketid: socket.id
       });
       numUsers --;
-      console.log('Disconnected socket id' + socket.id  + ' and there are now ' + numUsers + ' connected.');
+      delUserFromList(socket.id);
+      console.log('Disconnected socket id ' + socket.id  + ' and there are now ' + numUsers + ' connected.');
+      console.log(userList);
   });
 });
