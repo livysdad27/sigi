@@ -1,0 +1,15 @@
+{
+  "name": "sigi",
+  "version": "0.0.0",
+  "description": "Very simple lightweight signaling server for WebRTC", 
+  "main": "index.js",
+  "author": "Billy Jackson",
+  "private": true,
+  "dependencies": {
+    "socket.io": "2.0.1",
+    "express": "4.13.4"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
