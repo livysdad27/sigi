@@ -20,8 +20,8 @@ io.on('connection', function (socket) {
   socket.broadcast.emit('user joined', {
     socketid: socket.id
   });
-  
-  console.log('connected socket id ' + socket.id);
+  numUsers ++;  
+  console.log('connected socket id ' + socket.id + ' and there are ' + numUsers + ' total users.');
 
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
@@ -38,6 +38,7 @@ io.on('connection', function (socket) {
       socket.broadcast.emit('user left', {
         socketid: socket.id
       });
-      console.log('Disconnected socket id' + socket.id);
+      numUsers --;
+      console.log('Disconnected socket id' + socket.id  + ' and there are now ' + numUsers + ' connected.');
   });
 });
