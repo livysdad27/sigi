@@ -28,10 +28,11 @@ function delUserFromList(user){
 
     
 io.on('connection', function (socket) {
-  socket.broadcast.emit('user joined', {
-    socketid: socket.id
-  });
   numUsers ++;  
+  io.emit('user joined', {
+    socketid: socket.id,
+    numUsers: numUsers
+  });
   addUserToList(socket.id);
   console.log('connected socket id ' + socket.id + ' and there are ' + numUsers + ' total users.');
   console.log(userList);
@@ -47,10 +48,22 @@ io.on('connection', function (socket) {
     console.log(userList);
   });
 
+  // when the client emits 'new message', this listens and executes
+  socket.on('offer', function (data) {
+    // we tell the client to execute 'new message'
+    socket.broadcast.emit('offer', {
+      socketid: socket.id,
+      message: data
+    });
+    console.log(socket.id + 'made an offer!: ' + data);
+    console.log(userList);
+  });
+
   socket.on('disconnect', function(username){
       // echo globally that this client has left
       socket.broadcast.emit('user left', {
-        socketid: socket.id
+        socketid: socket.id,
+        numUsers: numUsers
       });
       numUsers --;
       delUserFromList(socket.id);
