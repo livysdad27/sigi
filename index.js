@@ -59,6 +59,17 @@ io.on('connection', function (socket) {
     console.log(userList);
   });
 
+  // when the client emits 'new message', this listens and executes
+  socket.on('answer', function (data) {
+    // we tell the client to execute 'new message'
+    socket.broadcast.emit('answer', {
+      socketid: socket.id,
+      message: data
+    });
+    console.log(socket.id + 'answered!: ' + data);
+    console.log(userList);
+  });
+
   socket.on('disconnect', function(username){
       // echo globally that this client has left
       socket.broadcast.emit('user left', {
