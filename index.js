@@ -66,7 +66,18 @@ io.on('connection', function (socket) {
       socketid: socket.id,
       message: data
     });
-    console.log(socket.id + 'answered!: ' + data);
+    console.log(socket.id + ' answered!: ' + data);
+    console.log(userList);
+  });
+
+  // when the client emits 'new message', this listens and executes
+  socket.on('candidate', function (data) {
+    // we tell the client to execute 'new message'
+    socket.broadcast.emit('candidate', {
+      socketid: socket.id,
+      message: data
+    });
+    console.log(socket.id + ' candidate sent: ' + data);
     console.log(userList);
   });
 
