@@ -5,12 +5,17 @@ var video=document.querySelector('video');
 var rvideo=document.querySelector('rvideo');
 var em = document.getElementById('emitter');
 var msgArea = document.getElementById('msgArea');
-var servers = null;
+var servers = [{ url: 'stun:stun.l.google.com:19302' }];
 var numUsers = window.numUsers = 0;
 var imFirst = false;
+var sd = null;
+var offerOptions = {
+  offerToReceiveAudio: 1,
+  offerToReceiveVideo: 1
+};
 
 var constraints = window.constraints = {
-  audio: false,
+  audio: true,
   video: true
 };
 
@@ -30,7 +35,7 @@ socket.on('user joined', function(data){
     console.log('I am first!!!!!!!!!');
   };
   if (data.numUsers == 2 && window.imFirst){
-    conn.createOffer().then(sendOffer).catch(onCreateSDPError);
+    conn.createOffer(offerOptions).then(sendOffer).catch(onCreateSDPError);
   }; 
 });
 
@@ -59,8 +64,14 @@ socket.on('answer', function(data){
   msgArea.innerHTML = msgArea.innerHTML + '<br>' + data.socketid + ' answered:' + data.message;
   conn.setRemoteDescription(data.message);
   console.log('Setting remote desc');
-  conn.onstream= gotRemoteStream;
+  conn.onaddstream= gotRemoteStream;
   console.log('Setup remote stream handler');
+});
+
+socket.on('candidate', function(data){
+  console.log('user ' + data.socketid + ' sent candidate ' + data.message);
+  msgArea.innerHTML = msgArea.innerHTML + '<br>' + data.socketid + ' sent candidate:' + data.message;
+  conn.addRemoteIceCandidate(data.candidate);
 });
 
 function handleSuccess(stream){
@@ -75,9 +86,13 @@ function handleError(error){
 
 navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
 
-conn = new RTCPeerConnection(servers);
+conn = new RTCPeerConnection();
 conn.addStream = window.stream; 
-console.log('created peer connection and attached stream');
+conn.onicecandidate = function(e){
+  socket.emit('candidate', e.candidate);
+  console.log('????????????????????????????????????????ICE');
+};
+
 
 function onCreateSDPError(error){
   console.log('Create SDP Error: ' + error.name);
@@ -86,13 +101,15 @@ function onCreateSDPError(error){
 function sendOffer(SDP){
   conn.setLocalDescription(SDP);
   socket.emit('offer', conn.localDescription);
-  console.log('offer made: ' + SDP);
+  console.log('offer made: ' );
+  console.log(SDP);
 }
 
 function sendAnswer(SDP){
   conn.setLocalDescription(SDP);
   socket.emit('answer', conn.localDescription);
-  console.log('answer made: ' + SDP);
+  console.log('answer made: ' );
+  console.log(SDP);
 }
 
 function gotRemoteStream(event){
