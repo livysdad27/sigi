@@ -35,50 +35,18 @@ io.on('connection', function (socket) {
   });
   addUserToList(socket.id);
   console.log('connected socket id ' + socket.id + ' and there are ' + numUsers + ' total users.');
-  console.log(userList);
 
   // when the client emits 'new message', this listens and executes
-  socket.on('new message', function (data) {
+  socket.on('message', function (data) {
     // we tell the client to execute 'new message'
-    socket.broadcast.emit('new message', {
+    socket.broadcast.emit('message', {
       socketid: socket.id,
       message: data
     });
-    console.log(socket.id + ': ' + data);
-    console.log(userList);
-  });
-
-  // when the client emits 'new message', this listens and executes
-  socket.on('offer', function (data) {
-    // we tell the client to execute 'new message'
-    socket.broadcast.emit('offer', {
-      socketid: socket.id,
-      message: data
-    });
-    console.log(socket.id + 'made an offer!: ' + data);
-    console.log(userList);
-  });
-
-  // when the client emits 'new message', this listens and executes
-  socket.on('answer', function (data) {
-    // we tell the client to execute 'new message'
-    socket.broadcast.emit('answer', {
-      socketid: socket.id,
-      message: data
-    });
-    console.log(socket.id + ' answered!: ' + data);
-    console.log(userList);
-  });
-
-  // when the client emits 'new message', this listens and executes
-  socket.on('candidate', function (data) {
-    // we tell the client to execute 'new message'
-    socket.broadcast.emit('candidate', {
-      socketid: socket.id,
-      message: data
-    });
-    console.log(socket.id + ' candidate sent: ' + data);
-    console.log(userList);
+    console.log('------------------------');
+    console.log(socket.id);
+    console.log(data);
+    console.log('------------------------');
   });
 
   socket.on('disconnect', function(username){
@@ -90,6 +58,5 @@ io.on('connection', function (socket) {
       numUsers --;
       delUserFromList(socket.id);
       console.log('Disconnected socket id ' + socket.id  + ' and there are now ' + numUsers + ' connected.');
-      console.log(userList);
   });
 });
