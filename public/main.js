@@ -32,7 +32,6 @@ function onMsg(e){
   }
 };
 
-
 conn = new RTCPeerConnection(servers);
 
 navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).catch(trace);
@@ -84,5 +83,8 @@ socket.on('message', function(data){
       conn.setRemoteDescription(data.message.sdp);
       conn.createAnswer().then(onCreateAnswer).catch(trace);
       break;
-    } 
+    case 'answer':
+      conn.setRemoteDescription(data.message.sdp);
+      break;
+  } 
 });
