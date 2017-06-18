@@ -1,7 +1,7 @@
 var socket = io();
 var servers = {
-  {url:'stun:stun.l.google.com:19302'},
-  {url:'stun:stun1.l.google.com:19302'}
+  url:'stun:stun.l.google.com:19302',
+  url:'stun:stun1.l.google.com:19302'
 };
 var lvideo = document.getElementById('localVideo');
 var rvideo = document.getElementById('remoteVideo');

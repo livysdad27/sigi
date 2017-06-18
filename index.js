@@ -1,7 +1,14 @@
 // Setup basic express server
+const fs = require('fs');
+var privKey = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem');
+var certPem = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/cert.pem');
+var sslOptions = { 
+  key: privKey,
+  cert:  certPem
+};
 var express = require('express');
 var app = express();
-var server = require('http').createServer(app);
+var server = require('https').createServer(sslOptions, app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
