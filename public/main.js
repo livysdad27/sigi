@@ -87,7 +87,6 @@ function makeAnswer(){
 
 
 conn = new RTCPeerConnection(servers);
-navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).then(addTracks).catch(trace);
 conn.onicecandidate = function(e){
   socket.emit('message', {type: 'candidate', candidate: e.candidate});
 };
