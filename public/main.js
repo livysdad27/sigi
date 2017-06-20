@@ -18,7 +18,6 @@ var mediaConstraints = {
   video: true
 };
 
-navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).catch(trace);
 
 function trace(e){
   dispMsg('Me', e.name);
@@ -43,6 +42,11 @@ function onCreateOffer(desc){
   conn.setLocalDescription(desc).then(socket.emit('message', {type: 'offer', sdp: desc})).catch(trace);
 };
 
+function onRenegotiateOffer(desc){
+  dispMsg('Me', 'Renegotiate offer');
+  socket.emit('message', {type: 'renegotiate', sdp: desc});
+};
+
 function onCreateAnswer(desc){
   dispMsg('Me', 'Created answer');
   conn.setLocalDescription(desc).then(socket.emit('message', {type: 'answer', sdp: desc})).catch(trace);
@@ -58,7 +62,9 @@ function gotStream(stream){
 function gotRemoteStream(e){
   dispMsg('Me', "gotRemoteStream");
   rstreams = conn.getRemoteStreams();
+  console.log(rstreams);
   rvideo.srcObject = rstreams[0];
+  console.log(rvideo.srcObject);
 };
 
 function addTracks(){
@@ -71,6 +77,25 @@ function addTracks(){
   dispMsg('Me', 'addTracks');
 };
 
+function makeOffer(){
+  conn.createOffer(offerOptions).then(onCreateOffer).catch(trace);
+};
+
+function makeAnswer(){
+  conn.createAnswer(offerOptions).then(onCreateAnswer).catch(trace);
+};
+
+
+conn = new RTCPeerConnection(servers);
+navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).then(addTracks).catch(trace);
+conn.onicecandidate = function(e){
+  socket.emit('message', {type: 'candidate', candidate: e.candidate});
+};
+conn.ontrack = gotRemoteStream;
+//conn.onnegotiationneeded = function(){
+//  conn.createOffer(offerOptions).then(onRenegotiateOffer).catch(trace);
+//};
+
 socket.on('user joined', function(data){
   dispMsg(data.socketid, 'joined');
   dispMsg('Me', data.numUsers + ' users are here');
@@ -80,25 +105,12 @@ socket.on('user joined', function(data){
   };
   if (data.numUsers == 2){
     if (imFirst){
-      conn = new RTCPeerConnection(servers);
-      addTracks();
-      conn.createOffer(offerOptions).then(onCreateOffer).catch(trace);
-      conn.onicecandidate = function(e){
-        socket.emit('message', {type: 'candidate', candidate: e.candidate});
-      };
-      conn.ontrack = gotRemoteStream;
+     navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).then(addTracks).then(makeOffer).catch(trace);
     }else{
       dispMsg('Me', 'I am second!');
-      conn = new RTCPeerConnection(servers);
-      addTracks();
-      conn.onicecandidate = function(e){
-        socket.emit('message', {type: 'candidate', candidate: e.candidate});
-      };
-      conn.ontrack = gotRemoteStream;
     };
   };
 });
-  
 
 socket.on('user left', function(data){
   dispMsg(data.socketid, 'left');
@@ -107,9 +119,12 @@ socket.on('user left', function(data){
 socket.on('message', function(data){
   dispMsg(data.socketid, data.message.type + ' ' + data.message);
   switch(data.message.type){
+    case 'renegotiate':
+      conn.setRemoteDescription(data.message.sdp);
+      break;
     case 'offer':
       conn.setRemoteDescription(data.message.sdp);
-      conn.createAnswer().then(onCreateAnswer).catch(trace);
+     navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).then(addTracks).then(makeAnswer).catch(trace);
       break;
     case 'answer':
       conn.setRemoteDescription(data.message.sdp);

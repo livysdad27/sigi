@@ -1,6 +1,0 @@
-Call/Answer Workflow....
-
-1.  When join see if n > 1
-2.  If n > 1 grab offer and send answer
-3.  If N > 1 then when you grab the offer bind it to the second video element.
-4.  Are there other elements?????
