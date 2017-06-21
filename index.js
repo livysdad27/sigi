@@ -67,11 +67,11 @@ io.on('connection', function (socket) {
 
   socket.on('disconnect', function(username){
       // echo globally that this client has left
+      numUsers --;
       socket.broadcast.emit('user left', {
         socketid: socket.id,
         numUsers: numUsers
       });
-      numUsers --;
       delUserFromList(socket.id);
       console.log('Disconnected socket id ' + socket.id  + ' and there are now ' + numUsers + ' connected.');
   });

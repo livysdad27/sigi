@@ -5,6 +5,7 @@ var servers = {
 };
 var lvideo = document.getElementById('localVideo');
 var rvideo = document.getElementById('remoteVideo');
+var rv = $('#remoteVideo');
 var em = document.getElementById('emitter');
 var msgArea = document.getElementById('msgArea');
 var imFirst = false;
@@ -113,9 +114,12 @@ conn.ontrack = gotRemoteStream;
 
 socket.on('user left', function(data){
   dispMsg(data.socketid, 'left');
-  if (data.numUsers ==1){
-    lvideo.srcObject = null;
+  dispMsg(data.numUsers, '----------------------------------------------------');
+  if (data.numUsers == 1){
+    dispMsg('Me', 'I am all ALONE!');
+    rvideo.srcObject = null;
     conn.close();
+//    rv.hide();
   }
   imFirst = true;
 });
