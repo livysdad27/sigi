@@ -1,20 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WebRTClandiathingamabobby</title>
+  <title>WebRTC Screen</title>
 </head>
 <body>
-  <div>
-    <video autoplay id='remoteVideo' width='60%' border='2'></video>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>WebRTC</h1>
+    </div> 
   </div>
-  <div>
-    <video autoplay id='localVideo' muted width='10%' border='2'></video><br>
-    Send a message: <input type='text' name='msg' id='emitter' onkeypress="onMsg(event)"></textarea>
+  <div class="row">
+    <div class="col-md-3">
+      <video autoplay id='localVideo' muted width="100%"></video>
+      Send a message: <input type='text' name='msg' id='emitter' onkeypress="onMsg(event)"></textarea>
+      <div id='msgArea'></div>
+    </div>
+    <div class="col-md-9">
+      <video autoplay id='remoteVideo' width="100%"></video>
+    </div>
   </div>
-  <div id='msgArea'></div>
-  <br>
+</div>
+
   <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> 
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/main.js"></script>
