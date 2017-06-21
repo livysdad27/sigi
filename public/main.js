@@ -99,7 +99,7 @@ socket.on('user left', function(data){
   dispMsg(data.socketid, 'left');
   if (data.numUsers == 1){
     dispMsg('Me', 'I am all ALONE!');
-//    rvideo.srcObject = null;
+    rvideo.srcObject = null;
     conn.close();
   }
   imFirst = true;
