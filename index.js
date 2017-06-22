@@ -1,5 +1,12 @@
 // Setup basic express server
 const fs = require('fs');
+var winston = require('winston');
+var logger = new(winston.Logger)({
+  transports: [
+    new(winston.transports.Console)(),
+    new (winston.transports.File)({ filename: 'sigi.log' })
+  ]
+});
 var express = require('express');
 var app = express();
 var privKey = null;
@@ -22,7 +29,7 @@ var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
 server.listen(port, function () {
-  console.log('Server listening at port %d', port);
+  logger.info({serverEvent: 'server listening', serverPort: port});
 });
 
 // Routing
@@ -50,7 +57,7 @@ io.on('connection', function (socket) {
     numUsers: numUsers
   });
   addUserToList(socket.id);
-  console.log('connected socket id ' + socket.id + ' and there are ' + numUsers + ' total users.');
+  logger.info({socketEvent: 'connection',socketId: socket.id, numUsers: numUsers});
 
   // when the client emits 'new message', this listens and executes
   socket.on('message', function (data) {
@@ -59,20 +66,18 @@ io.on('connection', function (socket) {
       socketid: socket.id,
       message: data
     });
-    console.log('------------------------');
-    console.log(socket.id);
-    console.log(data);
-    console.log('------------------------');
+    logger.info({socketEvent: 'message', socketId: socket.id, message: data}); 
   });
 
   socket.on('disconnect', function(username){
       // echo globally that this client has left
       numUsers --;
+      logger.info(username);
       socket.broadcast.emit('user left', {
         socketid: socket.id,
         numUsers: numUsers
       });
       delUserFromList(socket.id);
-      console.log('Disconnected socket id ' + socket.id  + ' and there are now ' + numUsers + ' connected.');
+      logger.info({socketEvent: 'disconnect', socketId: socket.id, numUsers: numUsers});
   });
 });
