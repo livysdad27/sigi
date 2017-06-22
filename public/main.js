@@ -77,18 +77,22 @@ function makeAnswer(){
 
 socket.on('user joined', function(data){
   dispMsg(data.socketid, 'joined');
-  conn = new RTCPeerConnection(servers);
-  conn.onicecandidate = function(e){
-  socket.emit('message', {type: 'candidate', candidate: e.candidate});
-};
-conn.ontrack = gotRemoteStream;
   if (data.numUsers == 1){
     dispMsg('Me', 'I am first!');
     imFirst = true;
+    navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).catch(trace);
   };
   if (data.numUsers == 2){
+    conn = new RTCPeerConnection(servers);
+    console.log('newconn');
+    console.log(conn);
+    conn.onicecandidate = function(e){
+      socket.emit('message', {type: 'candidate', candidate: e.candidate});
+    };
+    conn.ontrack = gotRemoteStream;
     if (imFirst){
-     navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).then(addTracks).then(makeOffer).catch(trace);
+      addTracks();
+      makeOffer();
     }else{
       dispMsg('Me', 'I am second!');
     };
@@ -101,6 +105,8 @@ socket.on('user left', function(data){
     dispMsg('Me', 'I am all ALONE!');
     rvideo.srcObject = null;
     conn.close();
+    console.log('dead conn');
+    console.log(conn);
   }
   imFirst = true;
 });
