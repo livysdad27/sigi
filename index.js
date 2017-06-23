@@ -4,7 +4,7 @@ var winston = require('winston');
 var logger = new(winston.Logger)({
   transports: [
     new(winston.transports.Console)(),
-    new (winston.transports.File)({ filename: 'sigi.log' })
+    new (winston.transports.File)({ filename: 'logs/sigi.log' })
   ]
 });
 var express = require('express');
