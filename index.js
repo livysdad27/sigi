@@ -1,5 +1,7 @@
-// Setup basic express server
+///////////// Use the node basic filesystem module ///////////
 const fs = require('fs');
+
+///////////// Winston Logging and Transport Setup /////////////
 var winston = require('winston');
 var logger = new(winston.Logger)({
   transports: [
@@ -7,36 +9,66 @@ var logger = new(winston.Logger)({
     new (winston.transports.File)({ filename: 'logs/sigi.log' })
   ]
 });
+
+
+
+///////////// Start setting up express ////////////////////////
 var express = require('express');
 var app = express();
+
+// LetsEncrypt SSL cert setup and logic to delineate dev/prod env and startup the Express server
 var privKey = null;
 var certPem = null;
 var sslOptions = null;
 if (fs.existsSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem')){
   privKey = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem');
   certPem = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/cert.pem');
-
   var sslOptions = { 
     key: privKey,
     cert:  certPem
   };
   var server = require('https').createServer(sslOptions, app);
+  var myCallbackURL = 'https://billyjackson.us/auth/google/callback';
 }
 else{
   var server = require('http').createServer(app);
+  var myCallbackURL = 'http://localhost/auth/google/callback:3000';
 };
-var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
 server.listen(port, function () {
   logger.info({serverEvent: 'server listening', serverPort: port});
 });
 
-// Routing
+///////////// Start setting up passport ///////////////////////
+var passport = require('passport');
+var GS = require('passport-google-oauth').OAuth2Strategy;
+
+passport.use(new GS({
+  clientID:	'261132786088-61lrf4js9n359sg5ks20kg2e6rea1704.apps.googleusercontent.com',
+  clientSecret:	'WPK_EJLC-F5Vnek78wqJo5ep',
+  callbackURL:	myCallbackURL
+},
+
+function(accessToken, refreshToken, profile, done) {
+       User.findOrCreate({ googleId: profile.id }, function (err, user) {
+         return done(err, user);
+       });
+  }
+));
+
+// Express Routing
 app.use(express.static(__dirname + '/public'));
 
-// Chatroom
 
+
+
+
+
+
+
+
+//////////////// User Array List and Count Handling //////////
 var numUsers = 0;
 var userList = [];
 
@@ -49,7 +81,10 @@ function delUserFromList(user){
   userList.splice(i, 1);
 };
 
-    
+
+
+///////////////// Initialize and begin Socket.io event handling ///////////////    
+var io = require('socket.io')(server);
 io.on('connection', function (socket) {
   numUsers ++;  
   io.emit('user joined', {
