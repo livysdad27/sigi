@@ -10,8 +10,6 @@ var logger = new(winston.Logger)({
   ]
 });
 
-
-
 ///////////// Start setting up express ////////////////////////
 var express = require('express');
 var app = express();
@@ -32,7 +30,7 @@ if (fs.existsSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem')){
 }
 else{
   var server = require('http').createServer(app);
-  var myCallbackURL = 'http://localhost/auth/google/callback:3000';
+  var myCallbackURL = 'http://localhost:3000/auth/google/callback';
 };
 var port = process.env.PORT || 3000;
 
@@ -51,19 +49,24 @@ passport.use(new GS({
 },
 
 function(accessToken, refreshToken, profile, done) {
-       User.findOrCreate({ googleId: profile.id }, function (err, user) {
-         return done(err, user);
-       });
-  }
+       logger.info(profile);
+       return done(null, profile.id); 
+       }
 ));
 
 // Express Routing
+
+app.get('/auth/google',
+  passport.authenticate('google', {scope:  ['https://www.googleapis.com/auth/plus.login'] 
+}));
+
+app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res){
+    res.redirect('/');
+});
+
 app.use(express.static(__dirname + '/public'));
-
-
-
-
-
 
 
 
