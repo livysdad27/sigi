@@ -9,6 +9,11 @@ var em = document.getElementById('emitter');
 var msgArea = document.getElementById('msgArea');
 var imFirst = false;
 var localStream;
+
+$.getJSON("udata", function(data){
+  msgArea.innerHTML = data.displayName;
+});
+
 var offerOptions = {
   offerToReceiveAudio: 1,
   offerToReceiveVideo: 1

@@ -1,5 +1,6 @@
 ///////////// Use the node basic filesystem module ///////////
 const fs = require('fs');
+var session = require('express-session');
 
 ///////////// Winston Logging and Transport Setup /////////////
 var winston = require('winston');
@@ -47,29 +48,49 @@ passport.use(new GS({
   clientSecret:	'WPK_EJLC-F5Vnek78wqJo5ep',
   callbackURL:	myCallbackURL
 },
-
 function(accessToken, refreshToken, profile, done) {
+       logger.info(accessToken);
        logger.info(profile);
-       return done(null, profile.id); 
+       return done(null, profile); 
        }
 ));
 
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
 // Express Routing
+
+app.use(session({ secret: 'toejambfredwina' } ));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.get('/auth/google',
   passport.authenticate('google', {scope:  ['https://www.googleapis.com/auth/plus.login'] 
 }));
 
 app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  function(req, res){
-    res.redirect('/');
+      passport.authenticate('google', {failureRedirect: '/nope' } ),
+      function (req, res){
+        logger.info('Calling the google auth callback!');
+        res.redirect('/');
 });
 
-app.use(express.static(__dirname + '/public'));
+app.get('/udata', function(req, res){
+  if (req.user === undefined){
+      res.json({});
+  }  
+  else {
+    res.json(req.user);
+  }
+});
 
-
-
+app.use('/', express.static(__dirname + '/public'));
 
 //////////////// User Array List and Count Handling //////////
 var numUsers = 0;
@@ -83,8 +104,6 @@ function delUserFromList(user){
   var i = userList.indexOf(user);
   userList.splice(i, 1);
 };
-
-
 
 ///////////////// Initialize and begin Socket.io event handling ///////////////    
 var io = require('socket.io')(server);
