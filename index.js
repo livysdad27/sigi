@@ -65,7 +65,7 @@ passport.deserializeUser(function(user, done) {
 
 // Express Routing
 
-app.use(session({ secret: 'toejambfredwina' } ));
+app.use(session({ secret: 'toejambfredwina', resave: false, saveUninitialized: true } ));
 app.use(passport.initialize());
 app.use(passport.session());
 
