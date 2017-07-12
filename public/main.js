@@ -26,6 +26,7 @@ var offerOptions = {
   offerToReceiveAudio: 1,
   offerToReceiveVideo: 1
 };
+
 var mediaConstraints = {
   audio: true,
   video: true
