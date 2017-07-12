@@ -11,7 +11,12 @@ var imFirst = false;
 var localStream;
 
 $.getJSON("udata", function(data){
-  msgArea.innerHTML = data.displayName;
+  if (data.displayName === undefined){
+    socket.close();
+    window.location.replace('auth/google');
+  } else {
+    msgArea.innerHTML = data.displayName;
+  };
 });
 
 var offerOptions = {
