@@ -65,7 +65,7 @@ passport.deserializeUser(function(user, done) {
 
 // Express Routing
 
-app.use(session({ secret: 'toejambfredwina', resave: false, saveUninitialized: true } ));
+app.use(session({ secret: 'toejambfredwina', resave: false, saveUninitialized: true , maxAge: 6000000 } ));
 app.use(passport.initialize());
 app.use(passport.session());
 

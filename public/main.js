@@ -9,6 +9,7 @@ var em = document.getElementById('emitter');
 var msgArea = document.getElementById('msgArea');
 var imFirst = false;
 var localStream;
+var userProf;
 
 $.getJSON("udata", function(data){
   if (data.displayName === undefined){
@@ -16,6 +17,8 @@ $.getJSON("udata", function(data){
     window.location.replace('auth/google');
   } else {
     msgArea.innerHTML = data.displayName;
+    userProf = data;
+    document.body.style.display = 'block';
   };
 });
 
