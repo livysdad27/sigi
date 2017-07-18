@@ -145,7 +145,7 @@ io.on('connection', function (socket) {
     numUsers: numUsers
   });
   addUserToList(socket.id);
-  logger.info({socketEvent: 'connection',socketId: socket.id, numUsers: numUsers});
+  logger.info({socketEvent: 'connection',socketid: socket.id, numUsers: numUsers});
 
   // when the client emits 'new message', this listens and executes
   socket.on('message', function (data) {
@@ -154,7 +154,7 @@ io.on('connection', function (socket) {
       socketid: socket.id,
       message: data
     });
-    logger.info({socketEvent: 'message', socketId: socket.id, message: data}); 
+    logger.info({socketEvent: 'message', socketid: socket.id, message: data}); 
   });
 
   socket.on('disconnect', function(username){
@@ -166,6 +166,6 @@ io.on('connection', function (socket) {
         numUsers: numUsers
       });
       delUserFromList(socket.id);
-      logger.info({socketEvent: 'disconnect', socketId: socket.id, numUsers: numUsers});
+      logger.info({socketEvent: 'disconnect', socketid: socket.id, numUsers: numUsers});
   });
 });
