@@ -34,7 +34,7 @@ if (fs.existsSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem')){
     cert:  certPem
   };
   var server = require('https').createServer(sslOptions, app);
-  var myCallbackURL = 'https://billyjackson.us/auth/google/callback';
+  var myCallbackURL = 'https://billyjackson.us:3000/auth/google/callback';
 }
 else{
   var server = require('http').createServer(app);
@@ -80,7 +80,7 @@ app.use(passport.session());
 app.get('/auth/google',
   passport.authenticate('google', {scope:  ['https://www.googleapis.com/auth/plus.login'] }),
   function(req, res){
-    loggerin.info('Calling google!');
+    logger.info('Calling google!');
   }
 );
 
