@@ -9,18 +9,12 @@ var em = document.getElementById('emitter');
 var msgArea = document.getElementById('msgArea');
 var imFirst = false;
 var localStream;
-var userProf;
+//var userProf;
 
-$.getJSON("udata", function(data){
-  if (data.displayName === undefined){
-    socket.close();
-    window.location.replace('auth/google');
-  } else {
-    msgArea.innerHTML = data.displayName;
-    userProf = data;
-    document.body.style.display = 'block';
-  };
-});
+//$.getJSON("udata", function(data){
+//    window.userProf = data;
+//    document.body.style.display = 'block';
+//});
 
 var offerOptions = {
   offerToReceiveAudio: 1,
@@ -45,8 +39,8 @@ function dispMsg(user, msg){
 function onMsg(e){
   var key=e.keycode || e.which;
   if (key==13){
-    socket.emit('message', {type: 'chat', text: em.value});
-    dispMsg('Me', em.value);
+    socket.emit('message', {type: 'chat', name: window.userProf.displayName, text: em.value});
+    dispMsg(window.userProf.displayName, em.value);
     em.value = '';
   }
 };
@@ -90,9 +84,9 @@ function makeAnswer(){
 };
 
 socket.on('user joined', function(data){
-  dispMsg(data.socketid, 'joined');
+  dispMsg(data.socketid, ' joined');
   if (data.numUsers == 1){
-    dispMsg('Me', 'I am first!');
+    dispMsg(window.userProf.displayName, 'I am first!');
     imFirst = true;
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).catch(trace);
   };
@@ -108,7 +102,7 @@ socket.on('user joined', function(data){
       addTracks();
       makeOffer();
     }else{
-      dispMsg('Me', 'I am second!');
+      dispMsg(window.userProf.displayName, 'I am second!');
     };
   };
 });
@@ -141,7 +135,7 @@ socket.on('message', function(data){
       conn.addIceCandidate(data.message.candidate).catch(trace);
       break;
     case 'chat':
-      dispMsg(data.socketid, data.message.text);
+      dispMsg(data.name, data.message.text);
       break;
   } 
 });

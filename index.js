@@ -19,6 +19,13 @@ var app = express();
 var privKey = null;
 var certPem = null;
 var sslOptions = null;
+
+if (fs.existsSync('whiteList.json')){
+  var whiteList = JSON.parse(fs.readFileSync('whiteList.json'));
+};
+
+logger.info(whiteList);
+
 if (fs.existsSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem')){
   privKey = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem');
   certPem = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/cert.pem');
@@ -71,22 +78,46 @@ app.use(passport.session());
 
 
 app.get('/auth/google',
-  passport.authenticate('google', {scope:  ['https://www.googleapis.com/auth/plus.login'] 
-}));
+  passport.authenticate('google', {scope:  ['https://www.googleapis.com/auth/plus.login'] }),
+  function(req, res){
+    loggerin.info('Calling google!');
+  }
+);
 
 app.get('/auth/google/callback',
-      passport.authenticate('google', {failureRedirect: '/nope' } ),
+      passport.authenticate('google', {failureRedirect: '/auth/nope' } ),
       function (req, res){
-        logger.info('Calling the google auth callback!');
-        res.redirect('/');
-});
+        logger.info('Calling the google auth callback and checking whitelist!');
+        logger.info('------------UserID----------------');
+        logger.info(req.user.id);
+        logger.info('-----------------------------------');
+    
+        if (whiteList.ids.indexOf(req.user.id) > -1){
+ 	  res.redirect('/');
+        } else {
+          res.redirect('/auth/nope');
+        };
+      }
+);
+
+
+app.get('/auth/nope', function (req, res){
+        res.send('nope!');
+      }
+);
 
 app.get('/udata', function(req, res){
   if (req.user === undefined){
       res.json({});
+      logger.info('Call to udata, undefined req.user.');
   }  
   else {
-    res.json(req.user);
+    if (whiteList.ids.indexOf(req.user.id)> -1){
+      res.json(req.user);
+      logger.info('Call to udata, DEFINED req.user ' + req.user.displayName);
+    }else{
+      res.json({});
+    };
   }
 });
 
