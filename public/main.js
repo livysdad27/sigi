@@ -9,12 +9,6 @@ var em = document.getElementById('emitter');
 var msgArea = document.getElementById('msgArea');
 var imFirst = false;
 var localStream;
-//var userProf;
-
-//$.getJSON("udata", function(data){
-//    window.userProf = data;
-//    document.body.style.display = 'block';
-//});
 
 var offerOptions = {
   offerToReceiveAudio: 1,
@@ -25,7 +19,6 @@ var mediaConstraints = {
   audio: true,
   video: true
 };
-
 
 function trace(e){
   dispMsg('Cyborg Trace', e.name);
@@ -135,7 +128,7 @@ socket.on('message', function(data){
       conn.addIceCandidate(data.message.candidate).catch(trace);
       break;
     case 'chat':
-      dispMsg(data.name, data.message.text);
+      dispMsg(data.message.name, data.message.text);
       break;
   } 
 });
