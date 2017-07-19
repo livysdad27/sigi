@@ -1,4 +1,4 @@
-var socket = io();
+var socket = io({query: "userName=" + window.userProf.displayName });
 var servers = {
   url:'stun:stun.l.google.com:19302',
   url:'stun:stun1.l.google.com:19302'
@@ -33,7 +33,7 @@ function onMsg(e){
   var key=e.keycode || e.which;
   if (key==13){
     socket.emit('message', {type: 'chat', name: window.userProf.displayName, text: em.value});
-    dispMsg(window.userProf.displayName, em.value);
+    dispMsg('Me: ', em.value);
     em.value = '';
   }
 };
@@ -77,9 +77,10 @@ function makeAnswer(){
 };
 
 socket.on('user joined', function(data){
-  dispMsg(data.socketid, ' joined');
+  console.log(data);
+  dispMsg('SYSTEM: ', data.userName + ' joined');
   if (data.numUsers == 1){
-    dispMsg(window.userProf.displayName, 'I am first!');
+    dispMsg('Me: ', 'I am first!');
     imFirst = true;
     navigator.mediaDevices.getUserMedia(mediaConstraints).then(gotStream).catch(trace);
   };
@@ -95,15 +96,15 @@ socket.on('user joined', function(data){
       addTracks();
       makeOffer();
     }else{
-      dispMsg(window.userProf.displayName, 'I am second!');
+      dispMsg('Me: ', 'I am second!');
     };
   };
 });
 
 socket.on('user left', function(data){
-  dispMsg(data.socketid, 'left');
+  dispMsg('SYSTEM: ', 'A user left');
   if (data.numUsers == 1){
-    dispMsg('Me', 'I am all ALONE!');
+    dispMsg('Me ', 'I am all ALONE!');
     rvideo.srcObject = null;
     conn.close();
     console.log('dead conn');

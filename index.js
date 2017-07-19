@@ -24,8 +24,6 @@ if (fs.existsSync('whiteList.json')){
   var whiteList = JSON.parse(fs.readFileSync('whiteList.json'));
 };
 
-logger.info(whiteList);
-
 if (fs.existsSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem')){
   privKey = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem');
   certPem = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/cert.pem');
@@ -141,11 +139,12 @@ var io = require('socket.io')(server);
 io.on('connection', function (socket) {
   numUsers ++;  
   io.emit('user joined', {
+    userName: socket.handshake.query.userName,
     socketid: socket.id,
     numUsers: numUsers
   });
   addUserToList(socket.id);
-  logger.info({socketEvent: 'connection',socketid: socket.id, numUsers: numUsers});
+  logger.info({socketEvent: 'connection',socketid: socket.id, numUsers: numUsers, userName: socket.handshake.query.userName});
 
   // when the client emits 'new message', this listens and executes
   socket.on('message', function (data) {
@@ -157,10 +156,9 @@ io.on('connection', function (socket) {
     logger.info({socketEvent: 'message', socketid: socket.id, message: data}); 
   });
 
-  socket.on('disconnect', function(username){
+  socket.on('disconnect', function(){
       // echo globally that this client has left
       numUsers --;
-      logger.info(username);
       socket.broadcast.emit('user left', {
         socketid: socket.id,
         numUsers: numUsers
