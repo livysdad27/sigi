@@ -5,6 +5,9 @@ var servers = {
 };
 var lvideo = document.getElementById('localVideo');
 var rvideo = document.getElementById('remoteVideo');
+var profImage = document.getElementById('profImg');
+profImage.src = window.userProf.photos[0].value
+
 var em = document.getElementById('emitter');
 var msgArea = document.getElementById('msgArea');
 var imFirst = false;
