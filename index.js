@@ -24,6 +24,10 @@ if (fs.existsSync('whiteList.json')){
   var whiteList = JSON.parse(fs.readFileSync('whiteList.json'));
 };
 
+if (fs.existsSync('reqList.json')){
+  var reqList = JSON.parse(fs.readFileSync('reqList.json'));
+};
+
 if (fs.existsSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem')){
   privKey = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/privkey.pem');
   certPem = fs.readFileSync('/etc/letsencrypt/live/billyjackson.us/cert.pem');
@@ -76,7 +80,7 @@ app.use(passport.session());
 
 
 app.get('/auth/google',
-  passport.authenticate('google', {scope:  ['https://www.googleapis.com/auth/plus.login'] }),
+  passport.authenticate('google', {scope:  ['https://www.googleapis.com/auth/plus.login', 'email'] }),
   function(req, res){
     logger.info('Calling google!');
   }
@@ -93,6 +97,13 @@ app.get('/auth/google/callback',
         if (whiteList.ids.indexOf(req.user.id) > -1){
  	  res.redirect('/');
         } else {
+          var reqKey = {id: req.user.id , dname: req.user.displayName};
+          console.log(reqList.indexOf(reqKey));
+          if (reqList.indexOf(reqKey) < 0){
+            logger.info('New requester.  Adding to req file.');
+            reqList.push(reqKey); 
+            fs.writeFile('reqList.json', JSON.stringify(reqList), function(){logger.info('Writing new requster.');});
+          };
           res.redirect('/auth/nope');
         };
       }
