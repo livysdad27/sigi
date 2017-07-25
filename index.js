@@ -95,14 +95,18 @@ app.get('/auth/google/callback',
         logger.info('-----------------------------------');
     
         if (whiteList.ids.indexOf(req.user.id) > -1){
+          loggerin.info('Whitelisted user.  Redirecting to app.');
  	  res.redirect('/');
         } else {
-          var reqKey = {id: req.user.id , dname: req.user.displayName};
-          console.log(reqList.indexOf(reqKey));
-          if (reqList.indexOf(reqKey) < 0){
+          var reqKey = {id: req.user.id , dname: req.user.displayName, email: req.user.emails[0].value};
+          logger.info('Checking user info.');
+          logger.info(reqKey);
+          if (reqList.indexOf(JSON.stringify(reqKey)) < 0){
             logger.info('New requester.  Adding to req file.');
-            reqList.push(reqKey); 
+            reqList.push(JSON.stringify(reqKey));
             fs.writeFile('reqList.json', JSON.stringify(reqList), function(){logger.info('Writing new requster.');});
+          }else{
+            logger.info('New requester found in reqList.');
           };
           res.redirect('/auth/nope');
         };
