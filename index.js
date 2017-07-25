@@ -129,6 +129,7 @@ app.get('/udata', function(req, res){
       logger.info('Call to udata, DEFINED req.user ' + req.user.displayName);
     }else{
       res.json({});
+      logger.info('Call to un-whitelisted req.user ' + req.user.displayName);
     };
   }
 });
