@@ -91,7 +91,7 @@ app.get('/auth/google/callback',
       function (req, res){
         logger.info('Calling the google auth callback and checking whitelist!');
         logger.info('------------UserID----------------');
-        logger.info(req.user.id);
+        logger.info({id: req.user.id, dname: req.user.displayName, email: req.user.emails[0].value});
         logger.info('-----------------------------------');
     
         if (whiteList.ids.indexOf(req.user.id) > -1){
