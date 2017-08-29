@@ -114,6 +114,7 @@ app.get('/auth/google/callback',
 
 
 app.get('/auth/nope', function (req, res){
+        logger.info("Someone got noped.");
         res.send('nope!');
       }
 );
@@ -132,6 +133,30 @@ app.get('/udata', function(req, res){
       logger.info('Call to un-whitelisted req.user ' + req.user.displayName);
     };
   }
+});
+
+app.get('/reqList', function (req, res){
+  if (req.user === undefined){
+    logger.info('Call to reqList but no good req.user!');
+    res.redirect('/auth/nope');
+  } else {
+    logger.info('Call to reqList.');
+    res.json(reqList);
+  };
+});
+
+app.get('/whiteList', function (req, res){
+  if (req.user === undefined){
+    logger.info('Call to whiteList but no good req.user!');
+    res.redirect('/auth/nope');
+  } else {
+    logger.info('Call to whiteList.  Query string' + req.query);
+    if (req.query.id != null){
+      whiteList.ids.push(req.query.id);
+      fs.writeFile('whiteList.json', JSON.stringify(whiteList), function(){logger.info('Writing new whiteList entry ' + req.query);});
+    };
+    res.json(whiteList);
+  };
 });
 
 app.use('/', express.static(__dirname + '/public'));
